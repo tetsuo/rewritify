@@ -5,7 +5,7 @@ browserify transform that rewrites require paths.
 # usage
 
 ```js
-browserify('./foo.js')
+browserify(__dirname + '/baz/foo.js')
   .transform(rewritify, {
     mapping: {
       'bar': '../bar/lib'
