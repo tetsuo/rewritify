@@ -1,6 +1,6 @@
 {
   "name": "rewritify",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "browserify transform that rewrites require paths",
   "main": "index.js",
   "scripts": {
