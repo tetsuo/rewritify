@@ -1,44 +1,46 @@
-var inherits = require('util').inherits;
 var path = require('path');
-var Transform = require('readable-stream/transform');
-var PassThrough = require('readable-stream/passthrough');
 var td = require('transform-deps');
+var through = require('through2');
+var relative = require('relative');
 
-
-module.exports = rewrite;
-
-function rewrite (file, opts) {
+module.exports = function (file, opts) {
   if (!opts) opts = {};
-  var extensions = opts.extensions || ['js'];
-  var pat = new RegExp('\.(' + extensions.join('|') + ')$');
-  if (!pat.test(file)) return new PassThrough();
-  if (!(this instanceof rewrite)) return new rewrite(file, opts);
-  this.src = '';
-  this.depth = path.dirname(file).replace(opts.basedir, '').split('/').length;
-  this.mapping = opts.mapping || {};
-  Transform.call(this);
-}
-inherits(rewrite, Transform);
 
-rewrite.prototype._transform = function (row, enc, next) { this.src += row; next(); };
+  var filetype = [].concat(opts.extensions).concat(['.js']);
+  filetype = new RegExp(filetype.join('|') + '$');
 
-rewrite.prototype._flush = function (next) {
-  var self = this;
-  var keys = Object.keys(this.mapping);
-  var src = td(this.src, function (id) {
-    var s = id.split('/');
-    var key = s[0];
-    if (~keys.indexOf(key)) {
-      s.shift();
-      var r = '';
-      for (var i = 0; i < self.depth-2; i++) r += '../';
-      r += self.mapping[key];
-      s.unshift(r);
-    }
-    ret = s.join('/');
-    return ret;
-  });
-  this.push(src);
-  next();
+  if (!filetype.test(file)) return through();
+
+  var src = '',
+      basedir = opts.basedir || path.dirname(file),
+      mapping = opts.mapping || {};
+
+  return through(write, end);
+
+  function write (row, enc, cb) {
+    src += row;
+    cb();
+  }
+
+  function end (cb) {
+    var self = this,
+        keys = Object.keys(mapping),
+        target, key, val, re, n;
+    target = td(src, function (id) {
+      for (var i = 0; i < keys.length; i++) {
+        key = keys[i];
+        val = mapping[key];
+        if (val.charAt(0) === '.')
+          val = relative(file, path.join(basedir, val));
+        re = new RegExp('^' + key + '(?:/.*)?$');
+        if (re.test(id)) {
+          n = id.replace(key, val);
+          return n;
+        }
+      }
+    });
+    this.push(target);
+    cb();
+  }
 };
 
