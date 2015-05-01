@@ -1,6 +1,6 @@
 {
   "name": "rewritify",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "browserify transform that rewrites require paths",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,9 @@
     "rewrite",
     "require",
     "browserify",
-    "transform"
+    "transform",
+    "bant",
+    "bantjs"
   ],
   "author": "Onur Gunduz <ogunduz@gmail.com> (http://onurgunduz.com/)",
   "license": "MIT",
@@ -27,7 +29,9 @@
     "tape": "^3.5.0"
   },
   "dependencies": {
-    "readable-stream": "^1.0.33",
+    "coffeeify": "^1.1.0",
+    "relative": "^1.2.0",
+    "through2": "^0.6.5",
     "transform-deps": "^0.1.1"
   }
 }
