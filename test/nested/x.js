@@ -1,0 +1,1 @@
+console.log(require('foo/bar') + require('./baz/x.js') + require('foo/bar/x'));

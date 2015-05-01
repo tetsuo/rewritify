@@ -1,0 +1,1 @@
+module.exports = 'eyo' + require('./a/x.js');
